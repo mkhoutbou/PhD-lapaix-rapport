@@ -37,6 +37,12 @@ public class ReportEntity {
     @Column(name = "date")
     private LocalDateTime date;
 
+    @Column(name = "indication")
+    private String indication;
+
+    @Column(name = "technique")
+    private String technique;
+
     @Column(name = "titre")
     private String titre;
 

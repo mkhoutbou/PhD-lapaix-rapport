@@ -38,6 +38,8 @@ public class ReportServiceImpl implements ReportService {
             spec = spec.or((root, query, cb) -> cb.like(root.get("codeReport"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("medecin"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("titre"), "%" + pattern + "%"))
+                    .or((root, query, cb) -> cb.like(root.get("indication"), "%" + pattern + "%"))
+                    .or((root, query, cb) -> cb.like(root.get("technique"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("conclusion"), "%" + pattern + "%"));
     
             return reportRepository.findAll(spec, pageable);
@@ -71,6 +73,8 @@ public class ReportServiceImpl implements ReportService {
             spec = spec.or((root, query, cb) -> cb.like(root.get("codeReport"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("medecin"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("titre"), "%" + pattern + "%"))
+                    .or((root, query, cb) -> cb.like(root.get("indication"), "%" + pattern + "%"))
+                    .or((root, query, cb) -> cb.like(root.get("technique"), "%" + pattern + "%"))
                     .or((root, query, cb) -> cb.like(root.get("conclusion"), "%" + pattern + "%"));
     
             return reportRepository.count(spec);

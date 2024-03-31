@@ -26,6 +26,8 @@ public class ReportDTO {
     private Long bulletinId;
     private String codeReport;
     private LocalDateTime date;
+    private String indication;
+    private String technique;
     private String titre;
     private String medecin;
     private String conclusion;
