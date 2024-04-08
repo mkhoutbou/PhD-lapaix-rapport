@@ -12,7 +12,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("http://depinfo-dev.tech:8081"); // Allows all origins
+        config.addAllowedOriginPattern("*"); // Allows all origins
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
