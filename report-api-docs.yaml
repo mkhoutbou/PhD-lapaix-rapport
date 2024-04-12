@@ -6,6 +6,62 @@ servers:
 - url: http://localhost:8082
   description: Generated server url
 paths:
+  /api/uniqueElementResults/{id}:
+    get:
+      tags:
+      - unique-element-results-service
+      operationId: getUniqueElementResultById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UniqueElementResults'
+    put:
+      tags:
+      - unique-element-results-service
+      operationId: updateUniqueElementResult
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: description
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UniqueElementResults'
+    delete:
+      tags:
+      - unique-element-results-service
+      operationId: deleteUniqueElementResult
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
   /api/reports/{id}:
     get:
       tags:
@@ -120,6 +176,58 @@ paths:
       responses:
         "204":
           description: No Content
+  /api/uniqueElementResults:
+    get:
+      tags:
+      - unique-element-results-service
+      operationId: getAllUniqueElementResults
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: search_string
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UniqueElementResults'
+    post:
+      tags:
+      - unique-element-results-service
+      operationId: createUniqueElementResult
+      parameters:
+      - name: description
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UniqueElementResults'
   /api/reports:
     get:
       tags:
@@ -224,6 +332,25 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ElementResult'
+  /api/uniqueElementResults/count:
+    get:
+      tags:
+      - unique-element-results-service
+      operationId: count
+      parameters:
+      - name: search_string
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
   /api/reports/{reportId}/elementResults:
     get:
       tags:
@@ -249,7 +376,7 @@ paths:
     get:
       tags:
       - report-service
-      operationId: count
+      operationId: count_1
       parameters:
       - name: search_string
         in: query
@@ -269,7 +396,7 @@ paths:
     get:
       tags:
       - element-result-service
-      operationId: count_1
+      operationId: count_2
       parameters:
       - name: search_string
         in: query
@@ -286,6 +413,20 @@ paths:
                 format: int64
 components:
   schemas:
+    UniqueElementResults:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        resultatGeneral:
+          type: boolean
+        description:
+          type: string
+        createdDate:
+          type: string
+        lastModifiedDate:
+          type: string
     Report:
       type: object
       properties:
@@ -300,6 +441,10 @@ components:
         date:
           type: string
           format: date-time
+        indication:
+          type: string
+        technique:
+          type: string
         titre:
           type: string
         medecin:
