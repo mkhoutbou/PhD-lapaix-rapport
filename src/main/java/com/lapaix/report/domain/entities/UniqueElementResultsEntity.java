@@ -43,7 +43,7 @@ public class UniqueElementResultsEntity {
     @Column(name = "resultat_general")
     private boolean resultatGeneral;
 
-    @Column(name = "description")
+    @Column(name = "description", unique = true, nullable = false)
     private String description;
 
     @CreatedDate
