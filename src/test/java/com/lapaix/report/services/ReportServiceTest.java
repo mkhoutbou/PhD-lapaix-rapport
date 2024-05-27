@@ -19,14 +19,10 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import com.lapaix.report.domain.entities.ElementResultEntity;
 import com.lapaix.report.domain.entities.ReportEntity;
-import com.lapaix.report.repositories.ReportRepository;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ReportServiceTest {
-
-        @Autowired
-        private ReportRepository reportRepository;
 
         @Autowired
         private ElementResultService elementResultService;
@@ -38,7 +34,6 @@ public class ReportServiceTest {
         void testCount() {
                 ReportEntity reportEntity1 = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report 1")
                                 .medecin("Dr. Test 1")
@@ -46,17 +41,16 @@ public class ReportServiceTest {
 
                 ReportEntity reportEntity2 = ReportEntity.builder()
                                 .bulletinId(2L)
-                                .codeReport("XYZ789")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report 2")
                                 .medecin("Dr. Test 2")
                                 .build();
 
                 // When
-                reportRepository.saveAndFlush(reportEntity1);
-                reportRepository.saveAndFlush(reportEntity2);
+                reportService.createReport(reportEntity1);
+                reportService.createReport(reportEntity2);
 
-                long totalCount = reportService.count("ABC1");
+                long totalCount = reportService.count("Test 1");
 
                 assertEquals(1, totalCount);
         }
@@ -66,7 +60,6 @@ public class ReportServiceTest {
 
                 ReportEntity reportEntity = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report")
                                 .medecin("Dr. Test")
@@ -78,7 +71,6 @@ public class ReportServiceTest {
                 // Then
                 assertNotNull(createdReport.getId());
                 assertEquals(reportEntity.getBulletinId(), createdReport.getBulletinId());
-                assertEquals(reportEntity.getCodeReport(), createdReport.getCodeReport());
                 assertEquals(reportEntity.getDate(), createdReport.getDate());
                 assertEquals(reportEntity.getTitre(), createdReport.getTitre());
                 assertEquals(reportEntity.getMedecin(), createdReport.getMedecin());
@@ -90,20 +82,20 @@ public class ReportServiceTest {
 
                 ReportEntity reportEntity = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report")
                                 .medecin("Dr. Test")
                                 .build();
 
-                ReportEntity savedReport = reportRepository.saveAndFlush(reportEntity);
+                ReportEntity savedReport = reportService.createReport(reportEntity);
                 Long reportId = savedReport.getId();
 
                 // When
                 reportService.deleteReport(reportId);
 
                 // Then
-                assertFalse(reportRepository.existsById(reportId));
+                Optional<ReportEntity> optionalReport = reportService.getReportById(reportId);
+                assertFalse(optionalReport.isPresent());
 
         }
 
@@ -111,7 +103,6 @@ public class ReportServiceTest {
         void testGetAllReports() {
                 ReportEntity reportEntity1 = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report 1")
                                 .medecin("Dr. Test 1")
@@ -119,14 +110,13 @@ public class ReportServiceTest {
 
                 ReportEntity reportEntity2 = ReportEntity.builder()
                                 .bulletinId(2L)
-                                .codeReport("XYZ789")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report 2")
                                 .medecin("Dr. Test 2")
                                 .build();
 
-                reportRepository.saveAndFlush(reportEntity1);
-                reportRepository.saveAndFlush(reportEntity2);
+                reportService.createReport(reportEntity1);
+                reportService.createReport(reportEntity2);
 
                 // When
                 Pageable pageable = PageRequest.of(0, 10);
@@ -135,9 +125,9 @@ public class ReportServiceTest {
                 // Then
                 assertEquals(2, reportPage.getTotalElements());
                 assertTrue(reportPage.stream()
-                                .anyMatch(report -> report.getCodeReport().equals("ABC123")));
+                                .anyMatch(report -> report.getMedecin().equals("Dr. Test 1")));
                 assertTrue(reportPage.stream()
-                                .anyMatch(report -> report.getCodeReport().equals("XYZ789")));
+                                .anyMatch(report -> report.getTitre().equals("Test Report 2")));
 
                 // When
                 pageable = PageRequest.of(0, 1);
@@ -149,12 +139,12 @@ public class ReportServiceTest {
 
                 // When
                 pageable = PageRequest.of(0, 10);
-                reportPage = reportService.getAllReports("ABC123", pageable);
+                reportPage = reportService.getAllReports("Test Report 2", pageable);
 
                 // Then
                 assertEquals(1, reportPage.getTotalElements());
                 assertTrue(reportPage.stream()
-                                .allMatch(report -> report.getCodeReport().equals("ABC123")));
+                                .allMatch(report -> report.getTitre().equals("Test Report 2")));
 
         }
 
@@ -164,13 +154,12 @@ public class ReportServiceTest {
                 // Given
                 ReportEntity reportEntity = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report")
                                 .medecin("Dr. Test")
                                 .build();
 
-                ReportEntity savedReport = reportRepository.saveAndFlush(reportEntity);
+                ReportEntity savedReport = reportService.createReport(reportEntity);
                 Long reportId = savedReport.getId();
 
                 // When
@@ -178,7 +167,6 @@ public class ReportServiceTest {
 
                 // Then
                 assertNotNull(retrievedReport);
-                assertEquals(reportEntity.getCodeReport(), retrievedReport.getCodeReport());
                 assertEquals(reportEntity.getTitre(), retrievedReport.getTitre());
                 assertEquals(reportEntity.getMedecin(), retrievedReport.getMedecin());
         }
@@ -189,13 +177,12 @@ public class ReportServiceTest {
                 // Given
                 ReportEntity reportEntity = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report")
                                 .medecin("Dr. Test")
                                 .build();
 
-                ReportEntity savedReport = reportRepository.saveAndFlush(reportEntity);
+                ReportEntity savedReport = reportService.createReport(reportEntity);
                 Long reportId = savedReport.getId();
 
                 ElementResultEntity elementResult1 = ElementResultEntity.builder()
@@ -242,19 +229,17 @@ public class ReportServiceTest {
                 // Given
                 ReportEntity reportEntity = ReportEntity.builder()
                                 .bulletinId(1L)
-                                .codeReport("ABC123")
                                 .date(LocalDateTime.now())
                                 .titre("Test Report")
                                 .medecin("Dr. Test")
                                 .build();
 
-                ReportEntity savedReport = reportRepository.saveAndFlush(reportEntity);
+                ReportEntity savedReport = reportService.createReport(reportEntity);
                 Long reportId = savedReport.getId();
 
                 ReportEntity updatedReport = ReportEntity.builder()
                                 .id(reportId)
                                 .bulletinId(2L)
-                                .codeReport("XYZ789")
                                 .titre("Updated Report")
                                 .medecin("Dr. Updated Test")
                                 .build();
@@ -263,11 +248,10 @@ public class ReportServiceTest {
                 updatedReport = reportService.updateReport(reportId, updatedReport);
 
                 // Then
-                Optional<ReportEntity> optionalReport = reportRepository.findById(reportId);
+                Optional<ReportEntity> optionalReport = reportService.getReportById(reportId);
                 assertTrue(optionalReport.isPresent());
                 ReportEntity retrievedReport = optionalReport.get();
                 assertEquals(updatedReport.getBulletinId(), retrievedReport.getBulletinId());
-                assertEquals(updatedReport.getCodeReport(), retrievedReport.getCodeReport());
                 assertEquals(updatedReport.getDate(), retrievedReport.getDate());
                 assertEquals(updatedReport.getTitre(), retrievedReport.getTitre());
                 assertEquals(updatedReport.getMedecin(), retrievedReport.getMedecin());

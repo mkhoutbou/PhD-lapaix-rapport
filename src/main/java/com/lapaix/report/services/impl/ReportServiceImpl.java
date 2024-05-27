@@ -1,5 +1,7 @@
 package com.lapaix.report.services.impl;
 
+import com.lapaix.report.configs.sequence.SequenceConfig;
+import com.lapaix.report.configs.sequence.SequenceRepository;
 import com.lapaix.report.domain.entities.ElementResultEntity;
 import com.lapaix.report.domain.entities.ReportEntity;
 import com.lapaix.report.repositories.ElementResultRepository;
@@ -19,11 +21,17 @@ import java.util.Optional;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
 
-    @Autowired
-    private ElementResultRepository elementResultRepository;
+    private final ElementResultRepository elementResultRepository;
+
+    private final SequenceRepository sequenceRepository;
+
+    public ReportServiceImpl(ReportRepository reportRepository, ElementResultRepository elementResultRepository, SequenceRepository sequenceRepository) {
+        this.reportRepository = reportRepository;
+        this.elementResultRepository = elementResultRepository;
+        this.sequenceRepository = sequenceRepository;
+    }
 
     @Override
     public Optional<ReportEntity> getReportById(Long id) {
@@ -49,6 +57,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportEntity createReport(ReportEntity report) {
+        SequenceConfig sequenceConfig = sequenceRepository.save(new SequenceConfig());
+        String codeReport = String.format("P-R%04d", sequenceConfig.getId());
+        report.setCodeReport(codeReport);
         return reportRepository.save(report);
     }
 
@@ -95,5 +106,7 @@ public class ReportServiceImpl implements ReportService {
         Optional.ofNullable(report.getTitre()).ifPresent(reportToUpdate::setTitre);
         Optional.ofNullable(report.getMedecin()).ifPresent(reportToUpdate::setMedecin);
         Optional.ofNullable(report.getConclusion()).ifPresent(reportToUpdate::setConclusion);
+        Optional.ofNullable(report.getIndication()).ifPresent(reportToUpdate::setIndication);
+        Optional.ofNullable(report.getTechnique()).ifPresent(reportToUpdate::setTechnique);        
     }
 }

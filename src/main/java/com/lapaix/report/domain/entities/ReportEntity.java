@@ -31,7 +31,7 @@ public class ReportEntity {
     @Column(name = "bulletin_id")
     private Long bulletinId;
 
-    @Column(name = "code_report")
+    @Column(name = "code_report", unique = true, nullable = false)
     private String codeReport;
 
     @Column(name = "date")
